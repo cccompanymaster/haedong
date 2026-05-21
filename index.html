@@ -2,10 +2,14 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="description" content="해동엔지니어링 - 부산 지역 3D 스캔(Point Cloud) 및 Scan-to-BIM 전문기업. 30년 현장 측량 노하우와 3D SLAM LiDAR 기술로 초고속·고정밀 3차원 공간정보를 제공합니다.">
   <meta name="keywords" content="해동엔지니어링, 3D스캔, Scan to BIM, 부산 측량, 3D SLAM LiDAR, Point Cloud, 토목설계, BricsCAD, Busan Scan to BIM">
   <meta name="author" content="해동엔지니어링">
+  <meta name="theme-color" content="#2A74B4">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="format-detection" content="telephone=yes">
   <meta property="og:title" content="해동엔지니어링 | Busan Scan to BIM">
   <meta property="og:description" content="30년 노하우 + 3D SLAM LiDAR로 만드는 초고속·고정밀 3차원 공간정보 토탈 솔루션">
   <meta property="og:type" content="website">
@@ -119,15 +123,15 @@
             <form class="form" onsubmit="handleQuoteSubmit(event)">
               <label>
                 <span>성함 *</span>
-                <input type="text" name="name" required placeholder="홍길동">
+                <input type="text" name="name" required placeholder="홍길동" autocomplete="name">
               </label>
               <label>
                 <span>연락처 *</span>
-                <input type="tel" name="phone" required placeholder="010-0000-0000">
+                <input type="tel" name="phone" required placeholder="010-0000-0000" inputmode="tel" autocomplete="tel" pattern="[0-9\-]+">
               </label>
               <label>
                 <span>이메일</span>
-                <input type="email" name="email" placeholder="example@email.com">
+                <input type="email" name="email" placeholder="example@email.com" inputmode="email" autocomplete="email">
               </label>
               <label>
                 <span>문의 내용 *</span>

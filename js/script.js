@@ -1,47 +1,86 @@
 /* =========================================================
-   해동엔지니어링 — Interactive scripts
+   해동엔지니어링 — Interactive scripts (Mobile optimized)
    ========================================================= */
 
 (function () {
   'use strict';
 
-  /* ---------- Mobile Nav Toggle ---------- */
+  const body = document.body;
+  const header = document.getElementById('siteHeader');
   const hamburger = document.getElementById('hamburger');
   const navList = document.getElementById('navList');
   const nav = document.querySelector('.nav');
 
+  /* ---------- Mobile Nav (slide-in panel) ---------- */
+  function closeNav() {
+    if (!nav) return;
+    nav.classList.remove('is-open');
+    hamburger.classList.remove('is-active');
+    hamburger.setAttribute('aria-expanded', 'false');
+    hamburger.setAttribute('aria-label', '메뉴 열기');
+    body.classList.remove('no-scroll');
+  }
+  function openNav() {
+    if (!nav) return;
+    nav.classList.add('is-open');
+    hamburger.classList.add('is-active');
+    hamburger.setAttribute('aria-expanded', 'true');
+    hamburger.setAttribute('aria-label', '메뉴 닫기');
+    body.classList.add('no-scroll');
+  }
+
   if (hamburger && nav) {
     hamburger.addEventListener('click', () => {
-      const isOpen = nav.classList.toggle('is-open');
-      hamburger.classList.toggle('is-active', isOpen);
-      hamburger.setAttribute('aria-expanded', isOpen);
+      nav.classList.contains('is-open') ? closeNav() : openNav();
     });
 
     navList.querySelectorAll('a').forEach(link => {
-      link.addEventListener('click', () => {
-        nav.classList.remove('is-open');
-        hamburger.classList.remove('is-active');
-        hamburger.setAttribute('aria-expanded', false);
-      });
+      link.addEventListener('click', closeNav);
     });
+
+    // Close on Escape
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && nav.classList.contains('is-open')) closeNav();
+    });
+
+    // Close on resize (orientation change to desktop)
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(() => {
+        if (window.innerWidth > 768 && nav.classList.contains('is-open')) closeNav();
+      }, 150);
+    }, { passive: true });
   }
 
   /* ---------- Sticky header shadow ---------- */
-  const header = document.getElementById('siteHeader');
   if (header) {
-    let lastY = 0;
+    let ticking = false;
     window.addEventListener('scroll', () => {
-      const y = window.scrollY;
-      header.style.boxShadow = y > 10 ? '0 4px 20px rgba(15,27,38,.08)' : 'none';
-      lastY = y;
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          header.style.boxShadow = window.scrollY > 10
+            ? '0 4px 20px rgba(15,27,38,.08)'
+            : 'none';
+          ticking = false;
+        });
+        ticking = true;
+      }
     }, { passive: true });
   }
 
   /* ---------- Back to top ---------- */
   const btnTop = document.getElementById('backToTop');
   if (btnTop) {
+    let ticking = false;
     window.addEventListener('scroll', () => {
-      btnTop.classList.toggle('is-visible', window.scrollY > 400);
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          btnTop.classList.toggle('is-visible', window.scrollY > 400);
+          ticking = false;
+        });
+        ticking = true;
+      }
     }, { passive: true });
     btnTop.addEventListener('click', () => {
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -62,7 +101,7 @@
           io.unobserve(entry.target);
         }
       });
-    }, { threshold: 0.12, rootMargin: '0px 0px -50px 0px' });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
 
     revealEls.forEach(el => io.observe(el));
   } else {
@@ -89,7 +128,7 @@
         requestAnimationFrame(tick);
         counterIO.unobserve(el);
       });
-    }, { threshold: 0.5 });
+    }, { threshold: 0.4 });
     counters.forEach(c => counterIO.observe(c));
   }
 
@@ -101,11 +140,34 @@
       const target = document.querySelector(href);
       if (!target) return;
       e.preventDefault();
-      const headerH = document.querySelector('.site-header')?.offsetHeight || 0;
-      const top = target.getBoundingClientRect().top + window.scrollY - headerH - 8;
-      window.scrollTo({ top, behavior: 'smooth' });
+      // close menu before scrolling on mobile
+      if (nav && nav.classList.contains('is-open')) closeNav();
+      requestAnimationFrame(() => {
+        const headerH = header?.offsetHeight || 0;
+        const top = target.getBoundingClientRect().top + window.scrollY - headerH - 8;
+        window.scrollTo({ top, behavior: 'smooth' });
+      });
     });
   });
+
+  /* ---------- Phone number auto-format (light) ---------- */
+  document.querySelectorAll('input[type="tel"]').forEach(input => {
+    input.addEventListener('input', (e) => {
+      let v = e.target.value.replace(/[^0-9]/g, '').slice(0, 11);
+      if (v.length >= 11) v = v.replace(/(\d{3})(\d{4})(\d{4})/, '$1-$2-$3');
+      else if (v.length >= 7) v = v.replace(/(\d{3})(\d{3,4})/, '$1-$2');
+      else if (v.length >= 4) v = v.replace(/(\d{3})(\d+)/, '$1-$2');
+      e.target.value = v;
+    });
+  });
+
+  /* ---------- Set dynamic viewport height var for mobile ---------- */
+  function setVH() {
+    document.documentElement.style.setProperty('--vh', `${window.innerHeight * 0.01}px`);
+  }
+  setVH();
+  window.addEventListener('resize', setVH, { passive: true });
+  window.addEventListener('orientationchange', setVH);
 
 })();
 
